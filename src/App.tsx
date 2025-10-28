@@ -66,7 +66,7 @@ export default function App() {
               Observatorio de votaciones del Congreso peruano
             </h1>
             <p className="max-w-2xl text-lg text-slate-300 md:text-xl">
-              Explora cómo votaron las y los congresistas en las leyes que Harvey Colcachado describe como pro-crimen. Usa el buscador para
+              Explora cómo votaron las y los congresistas en las leyes que Harvey Colchado describe como pro-crimen. Usa el buscador para
               encontrar rápidamente a tu representante y descubre sus posiciones.
             </p>
             <div className="flex flex-col gap-5 md:flex-row md:items-center">
