@@ -1,15 +1,37 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useVotos } from "@/hooks/useVotos";
+import { useVotos, VotosDataset } from "@/hooks/useVotos";
 import { SearchInput } from "@/components/SearchInput";
 import { VoteSummary } from "@/components/VoteSummary";
 import { VotesTable } from "@/components/VotesTable";
 
 const statusOrder = ["Favor", "Contra", "Abstencion", "Ausente", "Sin voto"];
 
+const datasetConfig: Record<
+  VotosDataset,
+  {
+    label: string;
+    description: string;
+  }
+> = {
+  colchado: {
+    label: "Leyes pro-crimen (Fuente: Harvey Colchado)",
+    description:
+      "Explora cómo votaron las y los congresistas en las leyes que Harvey Colchado describe como pro-crimen. Usa el buscador para encontrar rápidamente a tu representante y descubre sus posiciones.",
+  },
+  mef: {
+    label: "Objeciones del MEF",
+    description:
+      "Votaciones desde agosto del 2021 para la promulgación de leyes que el Ministerio de Economía y Finanzas objecionó. Usa el buscador para encontrar rápidamente a tu representante y descubre sus posiciones.",
+  },
+};
+
 export default function App() {
-  const { records, leyes, isLoading, error } = useVotos();
+  const [dataset, setDataset] = useState<VotosDataset>("colchado");
+  const { records, leyes, isLoading, error } = useVotos(dataset);
   const [query, setQuery] = useState("");
+
+  const { description, label } = datasetConfig[dataset];
 
   const filteredRecords = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -66,10 +88,34 @@ export default function App() {
               Observatorio de votaciones del Congreso peruano
             </h1>
             <p className="max-w-2xl text-lg text-slate-300 md:text-xl">
-              Explora cómo votaron las y los congresistas en las leyes que Harvey Colchado describe como pro-crimen. Usa el buscador para
-              encontrar rápidamente a tu representante y descubre sus posiciones.
+              {description}
             </p>
-            <div className="flex flex-col gap-5 md:flex-row md:items-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1 text-sm text-slate-200">
+              <span className="inline-flex h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
+              {label}
+            </div>
+            <div className="flex flex-col gap-5 md:flex-row md:flex-wrap md:items-center">
+              <div className="w-full md:max-w-xs">
+                <label htmlFor="dataset-select" className="mb-1 block text-sm font-medium text-slate-300">
+                  Fuente de datos
+                </label>
+                <div className="relative">
+                  <select
+                    id="dataset-select"
+                    value={dataset}
+                    onChange={(event) => setDataset(event.target.value as VotosDataset)}
+                    className="w-full appearance-none rounded-full border border-white/20 bg-slate-950 px-4 py-2 pr-10 text-sm text-slate-100 transition focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  >
+                    <option value="colchado">Leyes Pro-Crimen Harvey Colchado</option>
+                    <option value="mef">Objeciones del MEF</option>
+                  </select>
+                  <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-300">
+                    <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
               <div className="w-full md:max-w-xl">
                 <SearchInput value={query} onChange={setQuery} />
               </div>

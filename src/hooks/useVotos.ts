@@ -14,7 +14,14 @@ interface UseVotosResult {
   error: string | null;
 }
 
-export function useVotos(): UseVotosResult {
+export type VotosDataset = "colchado" | "mef";
+
+const datasetFiles: Record<VotosDataset, string> = {
+  colchado: "/votos_colchado.json",
+  mef: "/votos_mef.json",
+};
+
+export function useVotos(dataset: VotosDataset = "colchado"): UseVotosResult {
   const [records, setRecords] = useState<CongresistaRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +29,11 @@ export function useVotos(): UseVotosResult {
   useEffect(() => {
     let active = true;
 
-    fetch("/votos.json")
+    setIsLoading(true);
+    setError(null);
+    setRecords([]);
+
+    fetch(datasetFiles[dataset])
       .then((response) => {
         if (!response.ok) {
           throw new Error("No se pudo cargar el archivo de votos.");
@@ -52,7 +63,7 @@ export function useVotos(): UseVotosResult {
     return () => {
       active = false;
     };
-  }, []);
+  }, [dataset]);
 
   const leyes = useMemo(() => {
     if (records.length === 0) return [];
@@ -65,4 +76,3 @@ export function useVotos(): UseVotosResult {
 
   return { records, leyes, isLoading, error };
 }
-
